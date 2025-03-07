@@ -313,7 +313,7 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
                                 collate_fn=lambda x: data_processing(x, 'valid'),
                                 **kwargs)
 
-    model = conformer(num_classes=hparams['n_class'], 
+    model = Conformer_JUST(
                   input_dim=hparams['n_feats'], 
                   num_encoder_layers=8,
                   num_classes= len(token))
