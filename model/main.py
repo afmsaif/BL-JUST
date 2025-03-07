@@ -316,7 +316,7 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
     model = Conformer_JUST(
                   input_dim=hparams['n_feats'], 
                   num_encoder_layers=8,
-                  num_classes= len(token))
+                  num_classes= len(tokens))
    
     model = nn.DataParallel(model)
           
@@ -352,7 +352,7 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
     for root, dirs, files in os.walk(data_dir):
         for file in files:
 
-            if file.lower().endswith('.flac'):  # Adjust the file extension filter as needed
+            if file.lower().endswith('.flac'):  
                 audio_files.append(os.path.join(root, file))
   
 
@@ -368,7 +368,7 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
       
     train_loader2 = DataLoader(
         dataset=dataset,
-        batch_size=2, # each batch processes 2 audio files => potentially multiple chunks
+        batch_size=64, 
         shuffle=True,
         num_workers=4,
         collate_fn=raw_collate_fn,
