@@ -122,15 +122,12 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
     model.train()
     data_len_c = len(train_loader_c.dataset)
  
-    if epoch==1:
-      
-        print("Starting 20 epochs of CPC pre-training (encoder + CPC head)...")
         
-        info_loss = 0
+    info_loss = 0
         
-        for pre_ep in range(1, 21):
+    for pre_ep in range(1, 5):
 
-                for batch_idx, data_p in enumerate(train_loader2):
+        for batch_idx, data_p in enumerate(train_loader2):
                 
                 ########################       English #####################################################                       
                         pre_optimizer.zero_grad()
