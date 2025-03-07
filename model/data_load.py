@@ -1,5 +1,4 @@
 import os
-# from ctcdecode import CTCBeamDecoder
 import torch
 import torch.nn as nn
 import torch.utils.data as data
@@ -7,15 +6,11 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torchaudio
 import numpy as np
-from wer import calculate_wer
-# import torchmetrics
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import random
-from conformer import Conformer
 import time
-import sentencepiece as spm
-from info_nce import InfoNCE, info_nce
+
 
 
 class RawAudioDataset(Dataset):
