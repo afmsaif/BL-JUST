@@ -272,6 +272,58 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
 
 
 
+def final_supervised_finetune(
+    model,
+    device,
+    train_loader,
+    criterion,
+    enc_optimizer,
+    ctc_optimizer,
+    num_epochs=5,
+    lr=1e-5
+):
+    """
+    A short supervised-only fine-tuning at a lower LR.
+    """
+    print("Starting final supervised fine-tuning...")
+    # reset LR or create new optimizer
+    for g in enc_optimizer.param_groups:
+        g['lr'] = lr
+    for g in ctc_optimizer.param_groups:
+        g['lr'] = lr
+
+    for ep in range(num_epochs):
+        model.train()
+        total_loss = 0.0
+        for batch_idx, _data_c in enumerate(train_loader):
+            spectrograms_c, labels_c, input_lengths_c, label_lengths_c = _data_c
+            spectrograms_c = spectrograms_c.to(device)
+            labels_c = labels_c.to(device)
+            input_lengths_c = input_lengths_c.to(device)
+            label_lengths_c = label_lengths_c.to(device)
+
+            enc_optimizer.zero_grad()
+            ctc_optimizer.zero_grad()
+
+            output_cm = model(spectrograms_c, input_lengths_c)
+            ctc_acts = output_cm[0].transpose(0,1)
+            input_lengths_mod = output_cm[1]
+
+            ctc_loss = criterion(ctc_acts, labels_c, input_lengths_mod, label_lengths_c)
+            ctc_loss.backward()
+
+            enc_optimizer.step()
+            ctc_optimizer.step()
+
+            total_loss += ctc_loss.item()
+            if batch_idx % 100 == 0:
+                print(f"[FineTune Epoch {ep+1}/{num_epochs} - Batch {batch_idx}] CTC Loss: {ctc_loss.item():.4f}")
+
+        avg = total_loss/len(train_loader_labeled)
+        print(f"FineTune epoch {ep+1}: average CTC loss = {avg:.4f}")
+
+
+
 def main(learning_rate=5e-4, batch_size=80, epochs=10,
         train_url="train-clean-100", test_url="test-clean"):
 
