@@ -145,8 +145,8 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
                     
                         if batch_idx % 100 == 0 or batch_idx == data_len:
                             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tCPC_Loss: {:.6f}'.format(
-                                i, batch_idx * len(context), data_len,
-                                50. * batch_idx / len(train_loader2), loss_cpc1.item()))
+                                pre_ep, batch_idx * len(context), data_len,
+                                50. * batch_idx / len(train_loader2), loss_cpc.item()))
                 # prescheduler.step()
 
     # for batch_idx, (_data, inputs) in enumerate(zip(train_loader, train_loader2)):
@@ -215,9 +215,9 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
 
             output_c = output_cm[0].transpose(0, 1) # (time, batch, n_class)
 
-            loss = criterion(output_c, labels_cm, input_lengths_c1, label_lengths_cm)
+            ctc_loss = criterion(output_c, labels_cm, input_lengths_c1, label_lengths_cm)
 
-            train_loss += loss.item() / len(train_loader_c)  
+            train_loss += ctc_loss.item() / len(train_loader_c)  
 
               
             enc_optimizer.zero_grad()
@@ -431,7 +431,7 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
     ctc_optimizer = optim.AdamW(model.predictor_ctc.parameters(), lr=1e-4)
     
     pre_optimizer = optim.AdamW(
-        itertools.chain(model.encoder.parameters(), model.predictor.parameters()),
+        itertools.chain(model.conv_feature_extractor.parameters(), model.encoder.parameters(), model.predictor.parameters()),
         lr=1e-3
     )
     
