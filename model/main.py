@@ -281,11 +281,9 @@ def final_supervised_finetune(
     num_epochs=5,
     lr=1e-5
 ):
-    """
-    A short supervised-only fine-tuning at a lower LR.
-    """
+   
     print("Starting final supervised fine-tuning...")
-    # reset LR or create new optimizer
+
     for g in enc_optimizer.param_groups:
         g['lr'] = lr
     for g in ctc_optimizer.param_groups:
@@ -492,6 +490,8 @@ def main(learning_rate=5e-4, batch_size=80, epochs=10,
         train_loss.append(tra_loss)
         test_loss.append(tes_loss)
         wer.append(w)
+
+    final_supervised_finetune(model, device, train_loader_c, criterion, enc_optimizer, ctc_optimizer, num_epochs=5, lr=1e-5)
         
     return train_loss, test_loss, wer
 
