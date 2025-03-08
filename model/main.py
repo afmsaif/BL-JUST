@@ -35,8 +35,8 @@ def multi_step_info_nce(predicted, target, temperature=0.1):
     targ_flat = target.reshape(B * T, D)     # [B*T, D]
 
     # L2 normalize
-    pred_flat = F.normalize(pred_flat, p=2, dim=-1)
-    targ_flat = F.normalize(targ_flat, p=2, dim=-1)
+    # pred_flat = F.normalize(pred_flat, p=2, dim=-1)
+    # targ_flat = F.normalize(targ_flat, p=2, dim=-1)
 
     # Similarity
     # logits = torch.matmul(pred_flat, targ_flat.transpose(0, 1))  # => [B*T, B*T]
