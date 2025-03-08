@@ -155,6 +155,8 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
     train_loss = 0.0
 
     for batch_idx, (_data_c,data_p) in enumerate(zip(train_loader_c,train_loader2)):
+
+            gamma = round(gam, 3)
             
             ########################       English #####################################################
 
@@ -167,10 +169,7 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
 
             predicted, target = model(contexts, futures)
             cpc_loss = multi_step_info_nce(predicted, target)
-
-
-            gamma = round(gam, 3)
-            
+                        
             # torch.nn.utils.clip_grad_norm_(parameters=model.parameters(), max_norm=10, norm_type=2.0)
         
             info_loss += cpc_loss.item() / len(train_loader2)
