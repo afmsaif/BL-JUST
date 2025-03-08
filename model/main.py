@@ -136,7 +136,7 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
                         contexts = contexts.to(device)
                         futures = futures.to(device)
                       
-                        predicted, target = model(contexts, futures)
+                        predicted, target = model(context_wave=contexts, future_wave=futures)
                         cpc_loss = multi_step_info_nce(predicted, target)
                         cpc_loss.backward()
                         pre_optimizer.step()
@@ -167,7 +167,7 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
             spectrograms_c, labels_c, input_lengths_c, label_lengths_c = _data_c
 
 
-            predicted, target = model(contexts, futures)
+            predicted, target = model(context_wave=contexts, future_wave=futures)
             cpc_loss = multi_step_info_nce(predicted, target)
                         
             # torch.nn.utils.clip_grad_norm_(parameters=model.parameters(), max_norm=10, norm_type=2.0)
@@ -207,7 +207,7 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
 
             
 
-            output_cm = model(spectrograms_cm,input_lengths_cm)  # (batch_size, sequence_length, dim)
+            output_cm = model( mel_feat=spectrograms_c, mel_lengths=input_lengths_c) # (batch_size, sequence_length, dim)
 
                 
             input_lengths_c1 = output_cm[1]
@@ -225,7 +225,7 @@ def train(model, device, train_loader_c, criterion, enc_optimizer, cpc_optimizer
             ctc_optimizer.zero_grad()
 
 
-            enc_params = list(model.encoder.parameters())
+            enc_params = list(model.encoder.parameters()) + list(model.conv_feature_extractor.parameters())
             enc_grads = torch.autograd.grad(
                 outputs=(ctc_loss + gam * cpc_loss),
                 inputs=enc_params,
