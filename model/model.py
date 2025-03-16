@@ -16,19 +16,52 @@ from conformer import Conformer
 import time
 
 
-class ConvFeatureExtractor(nn.Module):
+# class ConvFeatureExtractor(nn.Module):
   
-    def __init__(self):
-        super().__init__()
-        self.conv_net = nn.Sequential(
-            nn.Conv1d(in_channels=1, out_channels=256, kernel_size=20, stride=10, padding=5),
-            nn.ReLU(),
-            nn.Conv1d(in_channels=256, out_channels=512, kernel_size=32, stride=16, padding=8),
-            nn.ReLU(),
-        )
+#     def __init__(self):
+#         super().__init__()
+#         self.conv_net = nn.Sequential(
+#             nn.Conv1d(in_channels=1, out_channels=256, kernel_size=20, stride=10, padding=5),
+#             nn.ReLU(),
+#             nn.Conv1d(in_channels=256, out_channels=512, kernel_size=32, stride=16, padding=8),
+#             nn.ReLU(),
+#         )
 
+#     def forward(self, x):
+#         return self.conv_net(x)
+
+
+class ConvFeatureExtractor(nn.Module):
+    def __init__(self, z_size=512):
+        super(ConvFeatureExtractor, self).__init__()
+        self.z_size = z_size
+        
+        # Reuse the same CNN architecture from the original code
+        # with a downsampling factor of 160
+        self.feature_conv = nn.Sequential( 
+            nn.Conv1d(1, self.z_size, kernel_size=10, stride=5, padding=3, bias=False),
+            nn.BatchNorm1d(self.z_size),
+            nn.ReLU(inplace=True),
+            nn.Conv1d(self.z_size, self.z_size, kernel_size=8, stride=4, padding=2, bias=False),
+            nn.BatchNorm1d(self.z_size),
+            nn.ReLU(inplace=True),
+            nn.Conv1d(self.z_size, self.z_size, kernel_size=4, stride=2, padding=1, bias=False),
+            nn.BatchNorm1d(self.z_size),
+            nn.ReLU(inplace=True),
+            nn.Conv1d(self.z_size, self.z_size, kernel_size=4, stride=2, padding=1, bias=False),
+            nn.BatchNorm1d(self.z_size),
+            nn.ReLU(inplace=True),
+            nn.Conv1d(self.z_size, self.z_size, kernel_size=4, stride=2, padding=1, bias=False),
+            nn.BatchNorm1d(self.z_size),
+            nn.ReLU(inplace=True)
+        )
+    
     def forward(self, x):
-        return self.conv_net(x)
+        """
+        x: (batch_size, channels=1, seq_len)
+        output: (batch_size, z_size, seq_len // 160)
+        """
+        return self.feature_conv(x)
 
 class Conformer_JUST(nn.Module):
 
